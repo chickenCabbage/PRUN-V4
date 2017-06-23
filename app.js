@@ -1,7 +1,9 @@
 var colors = require("colors"); //awsome console
 
 function errPrint(text) {
-	console.log("\n" + colors.red("ERROR: ") + text + "\n");
+	console.log("\n--------------------");
+	console.log(colors.red("ERROR: ") + text);
+	console.log("--------------------\n");
 }
 function wrnPrint(text) {
 	console.log(colors.yellow("WARNING: ") + text);
@@ -10,12 +12,14 @@ function wrnPrint(text) {
 var http = require("http");
 var port = 8888;
 
+var fs = require("fs");
+
 var landingPage = "./index.html"; //the page you get when you request "/"
-var errorPages = "./errors/";
+var errorPages = "./errors/"; //contains the error pages
 
 http.createServer(function(request, response) { //on every request to the server:
-	var filePath = request.url;
-	if(filePath == "/") filePath = landingPage; //there isn't actually a file as the directory.
+	var filePath = "." + request.url;
+	if(filePath == "./") filePath = landingPage; //there isn't actually a file as the directory.
 	//so we need to redirect the filepath to the actual landing page.
 	if(request.method == "GET") { //if the request has no hidden data
 		if(filePath.indexOf("?") != -1) { //if there's GET data
@@ -57,6 +61,7 @@ http.createServer(function(request, response) { //on every request to the server
 			response.end(content); //serve the requseted file
 		} //end try
 		catch(error) {
+			console.log(error);
 			if(error.code == "ENOENT") { //the file wasn't found
 				serve404(request, response);
 			}
@@ -83,31 +88,32 @@ function extractPost(request) {
 	});
 	request.on("end", function() { //when it's done reading the request
 		return data;
-	}
-}
+	});
+} //end extractPost()
 
-function serve404(request, response) {
+function serve404(request, response) { //file not found
 	wrnPrint("Served 404 for " + request.url);
 	try {
-		var content = fs.readFileSync(errors + "404.html");
+		var content = fs.readFileSync(errorPages + "404.html");
 		response.writeHead(404, {"Content-Type": "text/html"});
 		response.end(content);
 	}
 	catch(error) {
 		serve500(error, request, response);
 	}
-}
-function server403(request, response) {
+} //end serve404
+function serve403(request, response) { //access forbidden
 	console.log(); //spacing for attention
 	wrnPrint("Served 403 for " + request.url);
-	var ip = request.headers['x-forwarded-for'] || //extract IP address from the request
+
+	var ip = request.headers['x-forwarded-for'] || //extract the requester's IP address
 		request.connection.remoteAddress ||
 		request.socket.remoteAddress ||
 		request.connection.socket.remoteAddress;
 	console.log("403 from " + ip + "\n");
 
 	try {
-		var content = fs.readFileSync(errors + "403.html");
+		var content = fs.readFileSync(errorPages + "403.html");
 		response.writeHead(403, {"Content-Type": "text/html"});
 		response.end(content);
 	}
@@ -115,17 +121,17 @@ function server403(request, response) {
 		serve500(error, request, response);
 	}
 
-}
-function serve500(error, request, response) {
-	wrnPrint("Error thrown!\n" + error);
+} //end serve403()
+function serve500(error, request, response) { //internal server error
+	errPrint("An error occured! On request " + request.url + "\n" + error);
 	try {
-		var content = fs.readFileSync(errors + "500.html");
+		var content = fs.readFileSync(errorPages + "500.html").toString().replace("ERRME", error);
 		response.writeHead(500, {"Content-Type": "text/html"});
 		response.end(content);
 	}
-	catch(error2) {
-		wrnPrint("COULDN'T SERVE 500 PAGE.\n" + error2);
-		response.writeHead(500, {"Content-Type": "text/html"});
-		response.end("A severe error occured.");
+	catch(error2) { //if another error was thrown
+		errPrint("COULDN'T SERVE 500 PAGE.\n" + error2);
+		response.writeHead(500, {"Content-Type": "text/plain"});
+		response.end("A severe error occured.\n" + error2 + "\n\nCaused by\n\n" + error);
 	}
-}
+} //end serve500()
