@@ -1,0 +1,18 @@
+body {
+	font-family: "Georgia", "Garamond", "Trebuchet MS", "Arial";
+}
+
+.info {
+	width: 90%;
+	left: 5%;
+	position: absolute;
+	padding: 2%;
+	border-color: black;
+	border-style: solid;
+}
+.wide {
+	width: 70%;
+}
+.narrow {
+	width: 30%;
+}

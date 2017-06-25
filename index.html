@@ -2,20 +2,49 @@
 <html>
 <head>
 	<title>Prague Race Updates</title>
+	<link rel="stylesheet" type="text/css" href="./resources/style.css">
+	<script src="./resources/jQuery.js"></script>
+	<script>
+		window.onLoad = jQuery.get("/update.txt", function(data, status) { //init
+			updateText = data;
+			document.getElementById("lu-time").innerHTML = updateText.split("	")[0];
+			document.getElementById("lu-title").innerHTML = updateText.split("	")[1];
+			document.getElementById("lu-panel").src = updateText.split("	")[2];
+		});
+
+		function check() {
+			document.getElementById("status").innerHTML = "Checking for update...";
+			jQuery.get("./update.txt", function(data, status) {
+				if(data == updateText) {}
+				else { //yes update
+					document.getElementById("status").innerHTML = "Update!";
+					document.getElementById("lu-time").innerHTML = updateText.split("	")[0];
+					document.getElementById("lu-title").innerHTML = updateText.split("	")[1];
+					document.getElementById("lu-panel").src = updateText.split("	")[2];
+					notify(updateText.split("	")[2]);
+				}
+				updateText = data;
+			});
+		}
+	</script>
 </head>
 <body>
-<div>
-	<!--logo here and stuff-->
-</div>
-<div>
-	<!--follow stuff here-->
-	<!--sticky-->
-</div>
-	<table>
-		<tr>
-			<td></td>
-			<td></td>
+	<div>
+		<!--logo here and stuff-->
+	</div>
+	<div>
+		<!--follow stuff here-->
+		<!--sticky-->
+	</div>
+	<div class="info">
+		<div class="narrow"><p>Last update :</p></div>
+		<div class="wide"><p id="lu-time"></p></div>
+		<div class="wide"><p id="lu-title"></p></div>
+		<div class="narrow"><p>: Update title</p></div>
+		<div class="wide"><p id="status"></p></div>
+		<div class="caption"><p>Last panel :</p></div>
+		<div class="image"><img id="lu-panel"></div>
 		</tr>
-	</table>
+	</div>
 </body>
 </html>

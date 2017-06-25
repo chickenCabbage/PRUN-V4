@@ -10,7 +10,7 @@ var colors = require("colors"); //for fancy console
 var fs = require("fs"); //for readng the files
 var intervalTime = 2 * 60 * 1000;
 
-var title = fs.readFileSync("./update.txt").toString().split(",")[1]; //stores the page's title
+var title = fs.readFileSync("./update.txt").toString().split("	")[1]; //stores the page's title
 
 function errPrint(text) { //in case of error
 	console.log("\n" + colors.red("ERROR: ") + text);
@@ -27,11 +27,11 @@ function now() { //return the current time
 
 client.on("fetch", function(){ //when client.fetch() is called
 	try {
-		title = fs.readFileSync("./update.txt").toString().split(",")[1]; //read the current data
+		title = fs.readFileSync("./update.txt").toString().split("	")[1]; //read the current data
 		if(client.title != title) { //if the title changed - new page!
 			var time = client.parsedDocument(".cc-publishtime").html() //the div content
 			.split("<br>")[0].split("posted ")[1] + " EST"; //remove excess HTML/data
-			fs.writeFile("./update.txt", time + "," + client.title + "," + client.images[0]); //change update.txt
+			fs.writeFile("./update.txt", time + "	" + client.title + "	" + client.images[0]); //change update.txt
 
 			wrnPrint("UPDATED! on " + time + ": " + client.title); //woo
 			console.log("Recoginzed on " + now() + "\n");

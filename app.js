@@ -10,7 +10,7 @@ function wrnPrint(text) {
 }
 
 var http = require("http");
-var port = 8888;
+var port = 8886;
 
 var fs = require("fs");
 
