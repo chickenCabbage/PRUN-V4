@@ -7,12 +7,15 @@ body {
 	left: 5%;
 	position: absolute;
 	padding: 2%;
-	border-color: black;
-	border-style: solid;
+	text-align: center;
 }
 .wide {
 	width: 70%;
 }
 .narrow {
 	width: 30%;
+}
+
+div {
+	border-style: solid;
 }

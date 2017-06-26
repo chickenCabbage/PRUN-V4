@@ -10,7 +10,7 @@ function wrnPrint(text) {
 }
 
 var http = require("http");
-var port = 8886;
+var port = 80;
 
 var fs = require("fs");
 
@@ -61,7 +61,6 @@ http.createServer(function(request, response) { //on every request to the server
 			response.end(content); //serve the requseted file
 		} //end try
 		catch(error) {
-			console.log(error);
 			if(error.code == "ENOENT") { //the file wasn't found
 				serve404(request, response);
 			}
@@ -77,6 +76,8 @@ http.createServer(function(request, response) { //on every request to the server
 		var data = extractPost(request);
 	}
 }).listen(port);
+console.log("Starting now, " + new Date().toString());
+console.log("Listening on port "  + port + ".");
 
 function extractPost(request) {
 	var data = "";
