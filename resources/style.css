@@ -13,9 +13,9 @@ body {
 }
 
 .rot {
-	-ms-transform: skewX(-20deg);
-	-webkit-transform: skewX(-20deg);
-	transform: skewX(-20deg);
+	-ms-transform: skewX(-15deg);
+	-webkit-transform: skewX(-15deg);
+	transform: skewX(-15deg);
 
 	background-color: black;
 	color: white;
@@ -25,7 +25,7 @@ body {
 	display: inline-block;
 }
 .backrot {
-	-ms-transform: skewX(20deg); /*Internet Explorer*/
-	-webkit-transform: skewX(20deg); /*Safari*/
-	transform: skewX(20deg); /*As it should be*/
+	-ms-transform: skewX(15deg); /*Internet Explorer*/
+	-webkit-transform: skewX(15deg); /*Safari*/
+	transform: skewX(15deg); /*As it should be*/
 }
