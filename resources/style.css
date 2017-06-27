@@ -1,21 +1,23 @@
 body {
-	font-family: "Georgia", "Garamond", "Trebuchet MS", "Arial";
+	font-family: "Trebuchet MS", "Arial";
 }
 
 .info {
 	width: 90%;
 	left: 5%;
 	position: absolute;
-	padding: 2%;
+	padding: 3%;
 	text-align: center;
+	z-index: 1;
 }
-.wide {
-	width: 70%;
-}
-.narrow {
-	width: 30%;
+.marked {
+	color: white;
+	background-color: black;
 }
 
-div {
-	border-style: solid;
+#lu-panel {
+	width: 100%;
+	opacity: 0.3;
+	z-index: -1;
+	position: fixed;
 }
