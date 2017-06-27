@@ -1,23 +1,31 @@
 body {
 	font-family: "Trebuchet MS", "Arial";
-}
-
-.info {
-	width: 90%;
-	left: 5%;
-	position: absolute;
-	padding: 3%;
 	text-align: center;
-	z-index: 1;
-}
-.marked {
-	color: white;
-	background-color: black;
 }
 
-#lu-panel {
+#lu-panel { /*Background image - the last update panel*/
 	width: 100%;
+	position: absolute;
+	right: 0%;
 	opacity: 0.3;
 	z-index: -1;
 	position: fixed;
+}
+
+.rot {
+	-ms-transform: skewX(-20deg);
+	-webkit-transform: skewX(-20deg);
+	transform: skewX(-20deg);
+
+	background-color: black;
+	color: white;
+	padding: 0.5%;
+	padding-right: 3%;
+	padding-left: 3%;
+	display: inline-block;
+}
+.backrot {
+	-ms-transform: skewX(20deg); /*Internet Explorer*/
+	-webkit-transform: skewX(20deg); /*Safari*/
+	transform: skewX(20deg); /*As it should be*/
 }

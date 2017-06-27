@@ -4,29 +4,7 @@
 	<title>Prague Race Updates</title>
 	<link rel="stylesheet" type="text/css" href="./resources/style.css">
 	<script src="./resources/jQuery.js"></script>
-	<script>
-		window.onLoad = jQuery.get("/update.txt", function(data, status) { //init
-			updateText = data;
-			document.getElementById("lu-time").innerHTML = updateText.split("	")[0];
-			document.getElementById("lu-title").innerHTML = updateText.split("	")[1];
-			document.getElementById("lu-panel").src = updateText.split("	")[2];
-		});
-
-		function check() {
-			document.getElementById("status").innerHTML = "Checking for update...";
-			jQuery.get("./update.txt", function(data, status) {
-				if(data == updateText) {}
-				else { //yes update
-					document.getElementById("status").innerHTML = "Update!";
-					document.getElementById("lu-time").innerHTML = updateText.split("	")[0];
-					document.getElementById("lu-title").innerHTML = updateText.split("	")[1];
-					document.getElementById("lu-panel").src = updateText.split("	")[2];
-					notify(updateText.split("	")[2]);
-				}
-				updateText = data;
-			});
-		}
-	</script>
+	<script src="./resources/index.js"></script>
 </head>
 <body>
 	<img id="lu-panel">
@@ -39,19 +17,16 @@
 	<div>
 		<!--fixed navbar-->
 	</div>
-	<div class="info">
-
-		<!--<div class="narrow"><p>Last update :</p></div><div class="wide"><p id="lu-time"></p></div>
-		<div class="wide"><p id="lu-title"></p></div><div class="narrow"><p>: Update title</p></div>
-		<div class="wide"><p id="status"></p></div>
-		<div class="caption"><p>Last panel :</p></div><div class="image"><img id="lu-panel"></div>-->
-		<div id="lu-time-lbl" class="marked">Last Update :</div>
-		<div id="lu-time" class="marked">...</div>
-
-		<div id="lu-title" class="marked">...</div>
-		<div id="lu-title-lbl" class="marked">: Update title</div>
-
-		<div id="status" class="marked">Waiting for data...</div>
+	<div class="rot" id="info">
+		<h1 class="backrot" id="lu-title">lorem ipsum</h1>
+	</div>
+	<br><br><br><br>
+	<div class="rot" id="info">
+		<h1 class="backrot" id="lu-time">set dolor</h1>
+	</div>
+	<br><br><br><br>
+	<div class="rot" id="info">
+		<h1 class="backrot" id="status">Waiting for data...</h1>
 	</div>
 </body>
 </html>
