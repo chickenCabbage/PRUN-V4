@@ -31,6 +31,7 @@ client.on("fetch", function(){ //when client.fetch() is called
 		if(client.title != title) { //if the title changed - new page!
 			var time = client.parsedDocument(".cc-publishtime").html() //the div content
 			.split("<br>")[0].split("posted ")[1] + " EST"; //remove excess HTML/data
+			time = time.toString().replace("pm", "PM");
 			fs.writeFile("./update.txt", time + "	" + client.title + "	" + client.images[0]); //change update.txt
 
 			wrnPrint("UPDATED! on " + time + ": " + client.title); //woo

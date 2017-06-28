@@ -5,28 +5,29 @@
 	<link rel="stylesheet" type="text/css" href="/resources/style.css">
 	<script src="./resources/jQuery.js"></script>
 	<script src="./resources/index.js"></script>
+	<script src="./resources/gui.js"></script>
 </head>
 <body>
 	<img id="lu-panel">
-	<div>
-		<!--absolute title-->
+
+	<div id="center">
+		<div class="rot">
+			<h1 class="backrot" id="lu-title"></h1>
+		</div>
+		<br><br><br><br>
+		<div class="rot">
+			<h1 class="backrot" id="lu-time"></h1>
+		</div>
+		<br><br><br><br>
+		<div class="rot">
+			<h1 class="backrot" id="status">Last checked &infin; seconds ago.</h1>
+		</div>
 	</div>
-	<div>
-		<!--sticky-->
-	</div>
-	<div>
-		<!--fixed navbar-->
-	</div>
-	<div class="rot" id="info">
-		<h1 class="backrot" id="lu-title">lorem ipsum</h1>
-	</div>
-	<br><br><br><br>
-	<div class="rot" id="info">
-		<h1 class="backrot" id="lu-time">set dolor</h1>
-	</div>
-	<br><br><br><br>
-	<div class="rot" id="info">
-		<h1 class="backrot" id="status">Waiting for data...</h1>
+
+	<div id="nav">
+		<h1 id="arrow" onclick="toggleNav()">^</h1>
+		<br><br>
+		<div id="topbar"><h2>Yo</h2></div>
 	</div>
 </body>
 </html>
