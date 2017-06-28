@@ -58,7 +58,7 @@ body {
 }
 
 #topbar {
-	background-color: #4E9059;
+	background-image: url("/images/bg.png");
 	padding-top: 0.005%;
 	padding-bottom: 0.005%;
 }
