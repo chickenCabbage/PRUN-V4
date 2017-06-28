@@ -40,7 +40,7 @@ body {
 #nav {
 	top: 95%;
 	width: 100%;
-	height: 105%;
+	height: 110%;
 	margin: 0% auto;
 	margin-left: 0%;
 	margin-right: 0%;
@@ -49,9 +49,40 @@ body {
 	color: white;
 	background-color: black;
 	border-top: solid black 1%;
-	transition: 0.1s;
+	transition: 0.3s;
 }
 
-#arrow {
+#nav a {
+	color: white;
+	text-decoration: none;
+}
+
+#topbar {
+	background-color: #4E9059;
+	padding-top: 0.005%;
+	padding-bottom: 0.005%;
+}
+
+.navLeppu {
+	left: 0%;
+	top: 9%;
+	position: absolute;
+	margin-top: 0%;
+}
+
+#openNav, #closeNav {
+	margin: 0% auto;
 	margin-top: 0.75%;
+	transition: 0.2s;
+	cursor: pointer;
+}
+
+#credit {
+	text-align: left;
+	left: 1%;
+	position: absolute;
+}
+
+#credit a {
+	text-decoration: underline;
 }
