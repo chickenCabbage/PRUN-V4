@@ -1,4 +1,4 @@
-var colors = require("colors"); //awsome console
+                        var colors = require("colors"); //awsome console
 
 function errPrint(text) {
 	console.log("\n--------------------");
@@ -15,7 +15,6 @@ var port = 80;
 var fs = require("fs");
 
 var landingPage = "./index.html"; //the page you get when you request "/"
-var errorPages = "./errors/"; //contains the error pages
 
 http.createServer(function(request, response) { //on every request to the server:
 	var filePath = "." + request.url;
@@ -62,13 +61,13 @@ http.createServer(function(request, response) { //on every request to the server
 		} //end try
 		catch(error) {
 			if(error.code == "ENOENT") { //the file wasn't found
-				serve404(request, response);
+				serveError(404, "404, file not found", request, response);
 			}
 			else if(error == "forbidden") { //trying to get to user files
-				serve403(request, response);
+				serveError(403, "403, access forbidden", request, response);
 			}
 			else {
-				serve500(error, request, response);
+				serveError(500, "500: " + error.toString().replace("Error: ", ""), request, response);
 			}
 		} //end catch
 	} //end if(request.method == "GET")
@@ -92,47 +91,16 @@ function extractPost(request) {
 	});
 } //end extractPost()
 
-function serve404(request, response) { //file not found
-	wrnPrint("Served 404 for " + request.url);
+function serveError(code, text, request, response) { //internal server error
 	try {
-		var content = fs.readFileSync(errorPages + "404.html");
-		response.writeHead(404, {"Content-Type": "text/html"});
-		response.end(content);
-	}
-	catch(error) {
-		serve500(error, request, response);
-	}
-} //end serve404
-function serve403(request, response) { //access forbidden
-	console.log(); //spacing for attention
-	wrnPrint("Served 403 for " + request.url);
-
-	var ip = request.headers['x-forwarded-for'] || //extract the requester's IP address
-		request.connection.remoteAddress ||
-		request.socket.remoteAddress ||
-		request.connection.socket.remoteAddress;
-	console.log("403 from " + ip + "\n");
-
-	try {
-		var content = fs.readFileSync(errorPages + "403.html");
-		response.writeHead(403, {"Content-Type": "text/html"});
-		response.end(content);
-	}
-	catch(error) {
-		serve500(error, request, response);
-	}
-
-} //end serve403()
-function serve500(error, request, response) { //internal server error
-	errPrint("An error occured! On request " + request.url + "\n" + error);
-	try {
-		var content = fs.readFileSync(errorPages + "500.html").toString().replace("ERRME", error);
-		response.writeHead(500, {"Content-Type": "text/html"});
+		var content = fs.readFileSync("./error.html").toString().replace("ERRBODY", text);
+		response.writeHead(code, {"Content-Type": "text/html"});
 		response.end(content);
 	}
 	catch(error2) { //if another error was thrown
-		errPrint("COULDN'T SERVE 500 PAGE.\n" + error2);
+		var msg = "A severe error occured.\n" + error2 + "\n\nCaused by " + request.url + "\n\n" + text
+		errPrint(msg);
 		response.writeHead(500, {"Content-Type": "text/plain"});
-		response.end("A severe error occured.\n" + error2 + "\n\nCaused by\n\n" + error);
+		response.end(msg);
 	}
-} //end serve500()
+} //end serveError()

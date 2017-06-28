@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Error!</title>
+	<link rel="stylesheet" type="text/css" href="/resources/errpage.css">
+</head>
+<body>
+	<img id="bg" src="http://www.praguerace.com/images/bg.jpg">
+
+	<div class="rot" id="info">
+		<h1 class="backrot" id="err">ERRBODY</h1>
+	</div>
+
+	<script>
+		var div = document.getElementById("info");
+		var width = div.offsetWidth;
+		var height = div.offsetHeight;
+
+		div.style.marginTop = "-" + (height / 2) + "px";
+		div.style.marginLeft = "-" + (width / 2) + "px";
+	</script>
+</body>
+</html>

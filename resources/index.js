@@ -1,4 +1,3 @@
-var indexFlag = true;
 var updateText;
 var lastCheckTime = 0;
 
@@ -11,7 +10,7 @@ window.onLoad = jQuery.get("/update.txt", function(data, status) { //init
 	var img = document.getElementById("lu-panel");
 	var width = img.clientWidth;
 	var height = img.clientHeight + (img.clientHeight / 4);
-	var offset = (Math.random() * (height - (height / 2))) - (height / 2)
+	var offset = (Math.random() * (height - (height / 2))) - (height / 2);
 	img.style.bottom = offset + "px";
 
 	setInterval(function() {
