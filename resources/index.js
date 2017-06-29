@@ -11,6 +11,8 @@ window.onLoad = jQuery.get("/update.txt", function(data, status) { //init
 	var offset = (Math.random() * (height - (height / 2))) - (height / 2);
 	img.style.bottom = offset + "px";
 
+	document.getElementsByTagName("BODY")[0].style.opacity = "1";
+
 	setInterval(function() {
 		document.getElementById("status").innerHTML = "Checked " + lastCheckTime + " seconds ago."
 		if (lastCheckTime == 60){ //reset the check loop
@@ -63,5 +65,22 @@ function notify(image) {
 		setTimeout(function() {
 			notification.close();
 		}, 60000);
+	}
+}
+
+window.onscroll = function() {
+	var openNav = jQuery("#openNav").visible(true);
+	var closeNav = jQuery("#closeNav").visible(true);
+	if(openNav && closeNav) {
+		document.getElementById("openNav").style.opacity = "0";
+		document.getElementById("closeNav").style.opacity = "0";
+	}
+	else if(openNav) {
+		document.getElementById("openNav").style.opacity = "1";
+		document.getElementById("closeNav").style.opacity = "0";
+	}
+	else {
+		document.getElementById("openNav").style.opacity = "0";
+		document.getElementById("closeNav").style.opacity = "1";
 	}
 }

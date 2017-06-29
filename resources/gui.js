@@ -1,9 +1,16 @@
+var open = true;
 function toggleNav() {
 	var nav = document.getElementById("nav");
-	if(nav.style.top == "-10%") {
-		nav.style.top = "95%";
+	if(open) { //if it's closed
+		open = false;
+		jQuery("html, body").animate({ //scroll to the bottom
+			scrollTop: jQuery(document).height()
+		}, "slow", "swing");
 	}
-	else {
-		nav.style.top = "-10%";
+	else { //if it's open
+		open = true;
+		jQuery("html, body").animate({ //scroll to the top
+			scrollTop: 0
+		}, "regular", "swing");
 	}
 }
