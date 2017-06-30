@@ -11,6 +11,10 @@ window.onLoad = jQuery.get("/update.txt", function(data, status) { //init
 	var offset = (Math.random() * (height - (height / 2))) - (height / 2);
 	img.style.bottom = offset + "px";
 
+	jQuery("html, body").animate({ //scroll to the top
+			scrollTop: 0
+		}, 0);
+
 	document.getElementsByTagName("BODY")[0].style.opacity = "1";
 
 	setInterval(function() {

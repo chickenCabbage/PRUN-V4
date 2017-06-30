@@ -1,14 +1,14 @@
-var open = true;
+var hidden = true;
 function toggleNav() {
 	var nav = document.getElementById("nav");
-	if(open) { //if it's closed
-		open = false;
+	if(hidden) { //if it's closed
+		hidden = false;
 		jQuery("html, body").animate({ //scroll to the bottom
 			scrollTop: jQuery(document).height()
 		}, "slow", "swing");
 	}
 	else { //if it's open
-		open = true;
+		hidden = true;
 		jQuery("html, body").animate({ //scroll to the top
 			scrollTop: 0
 		}, "regular", "swing");
