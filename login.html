@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Prague Race Updates</title>
-	<link rel="stylesheet" type="text/css" href="/resources/indexStyle.css">
+	<title>Log in</title>
+	<link rel="stylesheet" type="text/css" href="/resources/style.css">
 	<script src="/resources/jQuery.js"></script>
-	<script src="/resources/index.js"></script>
+	<script src="/resources/login.js"></script>
 	<script src="/resources/visible.js"></script>
 	<script src="/resources/gui.js"></script>
 </head>
 <body>
-	<img id="lu-panel">
+	<img id="background" src="/images/background.png">
 
 	<div id="center">
 		<div class="rot">
-			<h1 class="backrot" id="lu-title"></h1>
+			<input type="text" class="backrot" placeholder="E-mail">
 		</div>
 		<br><br><br><br>
 		<div class="rot">
-			<h1 class="backrot" id="lu-time"></h1>
+			<input type="password" class="backrot" placeholder="Password">
 		</div>
 		<br><br><br><br>
-		<div class="rot">
-			<h1 class="backrot" id="status">Last checked &infin; seconds ago.</h1>
+		<div class="rot" onclick="ayo()" id="button">
+			<h2 class="backrot">Log in!</h2>
 		</div>
 	</div>
 
@@ -32,10 +32,10 @@
 		</div>
 		<br><br><br><br><br><br>
 		<h1><a href="http://praguerace.com/">Read the comic</a></h1>
-		<br><img src="/images/seperator.png" style="transform: rotate(180deg)"><br>
+		<br><img src="/images/seperator.png" style="transform: scaleX(1.25);"><br>
 		<h1><a href="/subscribe.html">Subscribe to email updates</a></h1>
-		<br><br><img src="/images/seperator.png" style="transform: scaleX(1.25);"><br><br>
-		<h1><a href="/login.html">Modify your settings</a></h1>
+		<br><br><img src="/images/seperator.png" style="transform: rotate(180deg)"><br><br>
+		<h1><a href="/">View update details</a></h1>
 
 		<h6 id="credit">Made by Alon Shiboleth and Idan Lerman
 		<br>
