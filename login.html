@@ -4,23 +4,23 @@
 	<title>Log in</title>
 	<link rel="stylesheet" type="text/css" href="/resources/style.css">
 	<script src="/resources/jQuery.js"></script>
-	<script src="/resources/login.js"></script>
 	<script src="/resources/visible.js"></script>
 	<script src="/resources/gui.js"></script>
+	<script src="/resources/login.js"></script>
 </head>
 <body>
 	<img id="background" src="/images/background.png">
 
 	<div id="center">
 		<div class="rot">
-			<input type="text" class="backrot" placeholder="E-mail">
+			<input type="text" class="backrot" placeholder="E-mail" id="email">
 		</div>
 		<br><br><br><br>
 		<div class="rot">
-			<input type="password" class="backrot" placeholder="Password">
+			<input type="password" class="backrot" placeholder="Password" id="pw">
 		</div>
 		<br><br><br><br>
-		<div class="rot" onclick="" id="button">
+		<div class="rot" onclick="authLogin()" id="button">
 			<h2 class="backrot">Log in!</h2>
 		</div>
 	</div>

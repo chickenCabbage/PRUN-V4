@@ -16,6 +16,10 @@ var fs = require("fs");
 
 var landingPage = "./index.html"; //the page you get when you request "/"
 
+function authLogin() {
+	
+}
+
 http.createServer(function(request, response) { //on every request to the server:
 	var filePath = "." + request.url;
 	if(filePath == "./") filePath = landingPage; //there isn't actually a file as the directory.
@@ -72,7 +76,20 @@ http.createServer(function(request, response) { //on every request to the server
 		} //end catch
 	} //end if(request.method == "GET")
 	else if(request.method == "POST") {
-		var data = extractPost(request);
+		switch(filePath) {
+			case "/authLogin": //if trying to log in
+				var data = toJson(extractPost(request)); //get the data to a readable format
+				var result = authLogin(data); //see if the credentials match
+
+				if(result.includes("Error: ")) { //if there was an error:
+					serveError(500, "500: " + result.replace("Error: ", ""), request, response);
+				}
+				else { //if there wasn't an error:
+					response.writeHead(200, {"Content-Type": "text/plain"});
+					response.end(result); //give the results
+				}
+			break;
+		}
 	}
 }).listen(port);
 console.log("Starting now, " + new Date().toString());
@@ -90,6 +107,10 @@ function extractPost(request) {
 		return data;
 	});
 } //end extractPost()
+
+function toJson() {
+
+}
 
 function serveError(code, text, request, response) { //internal server error
 	try {
