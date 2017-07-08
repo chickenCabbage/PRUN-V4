@@ -17,7 +17,7 @@ var fs = require("fs");
 var landingPage = "./index.html"; //the page you get when you request "/"
 
 function authLogin() {
-	
+	return true;
 }
 
 http.createServer(function(request, response) { //on every request to the server:
@@ -76,10 +76,14 @@ http.createServer(function(request, response) { //on every request to the server
 		} //end catch
 	} //end if(request.method == "GET")
 	else if(request.method == "POST") {
+		console.log("post");
 		switch(filePath) {
-			case "/authLogin": //if trying to log in
+			case "./authLogin": //if trying to log in
+				console.log("authing...");
 				var data = toJson(extractPost(request)); //get the data to a readable format
+				console.log("data: " + data.email + ", " + data.pw);
 				var result = authLogin(data); //see if the credentials match
+				console.log("reesult: " + result);
 
 				if(result.includes("Error: ")) { //if there was an error:
 					serveError(500, "500: " + result.replace("Error: ", ""), request, response);
@@ -87,7 +91,12 @@ http.createServer(function(request, response) { //on every request to the server
 				else { //if there wasn't an error:
 					response.writeHead(200, {"Content-Type": "text/plain"});
 					response.end(result); //give the results
+					console.log("served result");
 				}
+			break;
+
+			default:
+				console.log(filePath);
 			break;
 		}
 	}
@@ -100,16 +109,26 @@ function extractPost(request) {
 	request.on("data", function(chunk) { //if there's still data in the request that we haven't read
 		//check for stuff here ///////////////////////////////////////////////////////////////////////////////
 		data += chunk.toString(); //append it to the total data
+		console.log(data);
 		//kill the connection if there's too much data
-		if (data.toString().length > 1e6) request.connection.destroy();
+		if(data.toString().length > 1e6) {
+			request.connection.destroy();
+			console.log("Too much data, killing connection.");
+		}
 	});
 	request.on("end", function() { //when it's done reading the request
+		console.log(data);
 		return data;
 	});
 } //end extractPost()
 
-function toJson() {
-
+function toJson(data) {
+	data = data + "";
+	var json = {
+		email: data.split("=")[1].split("&")[0],
+		pw: data.split("=")[2].split("&")[0]
+	}
+	return json;
 }
 
 function serveError(code, text, request, response) { //internal server error
