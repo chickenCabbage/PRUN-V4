@@ -1,51 +1,39 @@
 var xh = new XMLHttpRequest();
 
 function authLogin() {
-	var email = document.getElementById("email");
-	var pw = document.getElementById("pw");
-	/*jQuery.post("/authLogin", {
-		email: email,
-		pw: pw
-	}, function(result) {
-		if(result.includes("Error: ")) {
-			alert("There was an error:\n" + result);
-			return;
+	var email = document.getElementById("email").value;
+	var pw = document.getElementById("pw").value;
+
+	jQuery.ajax({
+		url: "/authLogin",
+		type: "POST",
+		data: {
+			mail: email,
+			password: pw
+		},
+		success: function(data) {
+			switch(data) {
+				case "password":
+					alert("Your password didn't match the given E-mail.");
+				break;
+
+				case "user":
+					alert("A user with this E-mail doesn't exist.");
+				break;
+
+				case "verify":
+					alert("You must verify your E-mail before you can log in. Check your inbox!");
+				break;
+
+				default:
+					document.open();
+					document.write(data);
+					document.close();
+				break;
+			}
+		},
+		error: function(data) {
+			alert("There was a problem in logging in. Here's what we know:\n" + data);
 		}
-		switch(result) {
-			case "email":
-
-			break;
-
-			case "pw":
-
-			break;
-
-			case "verification":
-
-			break;
-
-			default:
-				document.open();
-				document.write(result);
-				document.close();
-			break;
-		}
-	});*/
-	alert("1");
-	var params = "email=" + email + "&pw=" + pw;
-	alert("2");
-	xh.open("POST", "http://127.0.0.1/authLogin", true);
-	alert("3");
-	xh.send(params);
-	alert("4");
-}
-
-xh.onreadystatechange = function() {//Call a function when the state changes.
-	alert("changed");
-	if(xh.readyState == 4 && xh.status == 200) {
-		alert(xh.responseText);
-	}
-	else {
-		alert(xh.status);
-	}
+	});
 }

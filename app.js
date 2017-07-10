@@ -1,4 +1,4 @@
-                        var colors = require("colors"); //awsome console
+var colors = require("colors"); //awsome console
 
 function errPrint(text) {
 	console.log("\n--------------------");
@@ -13,11 +13,19 @@ var http = require("http");
 var port = 80;
 
 var fs = require("fs");
+var forbiddenFiles = ["./prefs.html"];
 
 var landingPage = "./index.html"; //the page you get when you request "/"
 
-function authLogin() {
-	return true;
+function authLogin(json) {
+	try {
+		var prefs = fs.readFileSync("./prefs.html"); //serve the prefs page
+		return prefs;
+	}
+	catch(err) {
+		errPrint("in authLogin: " + err);
+		return "Error: " + err;
+	}
 }
 
 http.createServer(function(request, response) { //on every request to the server:
@@ -25,6 +33,12 @@ http.createServer(function(request, response) { //on every request to the server
 	if(filePath == "./") filePath = landingPage; //there isn't actually a file as the directory.
 	//so we need to redirect the filepath to the actual landing page.
 	if(request.method == "GET") { //if the request has no hidden data
+		for (var i = forbiddenFiles.length - 1; i >= 0; i--) {
+			if(filePath.includes(forbiddenFiles[i])) {
+				serveError(403, "403, file firbidden.", request, response);
+			}
+		}
+
 		if(filePath.indexOf("?") != -1) { //if there's GET data
 			//do stuff here /////////////////////////////////////////////////////////////
 		}
@@ -50,13 +64,7 @@ http.createServer(function(request, response) { //on every request to the server
 					response.writeHead(200, {"Content-Type": "application/javascript"});
 				break;
 
-				//disallowed
-				case "usr":
-				case "unv":
-					throw "forbidden";
-				break;
-
-				//serve as plaintext
+				//serve as text/format
 				default:
 					response.writeHead(200, {"Content-Type": "text/" + type});
 				break;
@@ -66,9 +74,7 @@ http.createServer(function(request, response) { //on every request to the server
 		catch(error) {
 			if(error.code == "ENOENT") { //the file wasn't found
 				serveError(404, "404, file not found", request, response);
-			}
-			else if(error == "forbidden") { //trying to get to user files
-				serveError(403, "403, access forbidden", request, response);
+				wrnPrint("Could not find file " + filePath);
 			}
 			else {
 				serveError(500, "500: " + error.toString().replace("Error: ", ""), request, response);
@@ -76,60 +82,53 @@ http.createServer(function(request, response) { //on every request to the server
 		} //end catch
 	} //end if(request.method == "GET")
 	else if(request.method == "POST") {
-		console.log("post");
-		switch(filePath) {
+		switch(filePath) { //what is the user trying to do?
 			case "./authLogin": //if trying to log in
-				console.log("authing...");
-				var data = toJson(extractPost(request)); //get the data to a readable format
-				console.log("data: " + data.email + ", " + data.pw);
-				var result = authLogin(data); //see if the credentials match
-				console.log("reesult: " + result);
-
-				if(result.includes("Error: ")) { //if there was an error:
-					serveError(500, "500: " + result.replace("Error: ", ""), request, response);
-				}
-				else { //if there wasn't an error:
-					response.writeHead(200, {"Content-Type": "text/plain"});
-					response.end(result); //give the results
-					console.log("served result");
-				}
-			break;
-
-			default:
-				console.log(filePath);
+				extractPost(request, response); //get the data to a readable format
 			break;
 		}
 	}
 }).listen(port);
-console.log("Starting now, " + new Date().toString());
-console.log("Listening on port "  + port + ".");
 
-function extractPost(request) {
+function extractPost(request, response) {
 	var data = "";
 	request.on("data", function(chunk) { //if there's still data in the request that we haven't read
 		//check for stuff here ///////////////////////////////////////////////////////////////////////////////
 		data += chunk.toString(); //append it to the total data
-		console.log(data);
-		//kill the connection if there's too much data
-		if(data.toString().length > 1e6) {
-			request.connection.destroy();
-			console.log("Too much data, killing connection.");
+		if(data.toString().length > 1e6) { //kill the connection if there's too much data at once
+			request.connection.destroy(); //disconnect
+			wrnPrint("Too much data, killing connection.");
 		}
 	});
 	request.on("end", function() { //when it's done reading the request
-		console.log(data);
-		return data;
+		if(response) { //if the called gave a response object for autoserving
+			serveText(authLogin(toJson(data)), response); //do so
+		}
+		else { //otherwise
+			return data; //return normally
+		}
 	});
 } //end extractPost()
 
 function toJson(data) {
-	data = data + "";
 	var json = {
 		email: data.split("=")[1].split("&")[0],
 		pw: data.split("=")[2].split("&")[0]
 	}
 	return json;
-}
+} //end toJson()
+
+function serveText(text, response) {
+	try {
+		response.writeHead(200, {"Content-Type": "text/plain"});
+		response.end(text);
+	}
+	catch(err) { //if an error was thrown
+		errPrint("in serving plaintext: " + err);
+		response.writeHead(500, {"Content-Type": "text/plain"});
+		response.end("Error: " + err);
+	}
+} //end serveText()
 
 function serveError(code, text, request, response) { //internal server error
 	try {
@@ -138,9 +137,12 @@ function serveError(code, text, request, response) { //internal server error
 		response.end(content);
 	}
 	catch(error2) { //if another error was thrown
-		var msg = "A severe error occured.\n" + error2 + "\n\nCaused by " + request.url + "\n\n" + text
+		var msg = "A severe error occured.\n" + error2 + "\n\nCaused by " + request.url + "\n\n" + text;
 		errPrint(msg);
 		response.writeHead(500, {"Content-Type": "text/plain"});
 		response.end(msg);
 	}
 } //end serveError()
+
+console.log("Starting now, " + new Date().toString());
+console.log("Listening on port "  + port + ".");
