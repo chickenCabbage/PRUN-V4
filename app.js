@@ -14,19 +14,9 @@ var port = 80;
 
 var fs = require("fs");
 var forbiddenFiles = ["./prefs.html"];
-
 var landingPage = "./index.html"; //the page you get when you request "/"
 
-function authLogin(json) {
-	try {
-		var prefs = fs.readFileSync("./prefs.html"); //serve the prefs page
-		return prefs;
-	}
-	catch(err) {
-		errPrint("in authLogin: " + err);
-		return "Error: " + err;
-	}
-}
+var crypto = require("crypto"); //password hashing
 
 http.createServer(function(request, response) { //on every request to the server:
 	var filePath = "." + request.url;
@@ -35,13 +25,14 @@ http.createServer(function(request, response) { //on every request to the server
 	if(request.method == "GET") { //if the request has no hidden data
 		for (var i = forbiddenFiles.length - 1; i >= 0; i--) {
 			if(filePath.includes(forbiddenFiles[i])) {
-				serveError(403, "403, file firbidden.", request, response);
+				serveError(403, "403, file forbidden.", request, response);
 			}
 		}
 
 		if(filePath.indexOf("?") != -1) { //if there's GET data
 			//do stuff here /////////////////////////////////////////////////////////////
 		}
+
 		try {
 			var content = fs.readFileSync(filePath); //check if the file exists and read it!
 			//no error yet? That means the file was found.
@@ -102,7 +93,7 @@ function extractPost(request, response) {
 	});
 	request.on("end", function() { //when it's done reading the request
 		if(response) { //if the called gave a response object for autoserving
-			serveText(authLogin(toJson(data)), response); //do so
+			authLogin(parsePost(data), request, response); //do so
 		}
 		else { //otherwise
 			return data; //return normally
@@ -110,13 +101,31 @@ function extractPost(request, response) {
 	});
 } //end extractPost()
 
-function toJson(data) {
+function parsePost(data) {
 	var json = {
 		email: data.split("=")[1].split("&")[0],
 		pw: data.split("=")[2].split("&")[0]
 	}
 	return json;
 } //end toJson()
+
+function parseCookies(cookies) {
+	cookies = {
+		email: cookies.split("=")[1].split(";")[0],
+		pw: cookies.split("=")[2]
+	}
+	return cookies;
+} //end parseCookies()
+
+function hash(text) { //encrypt text
+	try {
+		return crypto.createHash("md5").update(text).digest("hex");
+	}
+	catch(err) {
+		errPrint("in hashing: " + err);
+		return null;
+	}
+} //end hash()
 
 function serveText(text, response) {
 	try {
@@ -143,6 +152,37 @@ function serveError(code, text, request, response) { //internal server error
 		response.end(msg);
 	}
 } //end serveError()
+
+function authLogin(postJson, response) {
+	try {
+		var pw = "";
+		if(pw == postJson.pw) { //success!
+			var prefs = fs.readFileSync("./prefs.html"); //serve the prefs page
+			if(response) {
+				response.writeHead(200, {
+					"Set-Cookie": [
+						"email=" + postJson.email + "; expires=2628000000;",
+						"pw=" + hash(postJson.pw) + "; expires=2628000000; HttpOnly;"
+					],
+					"Content-Type": "text/plain"
+				}); //emd response.writeHead
+				response.end(prefs);
+			}
+			else {
+				return prefs;
+			}
+		} //end if
+	}
+	catch(err) {
+		errPrint("in authLogin: " + err);
+		if(response) {
+			serveError(500, err, null, response);
+		}
+		else {
+			return "Error: " + err;
+		}
+	} //end catch
+} //end authLogin()
 
 console.log("Starting now, " + new Date().toString());
 console.log("Listening on port "  + port + ".");
