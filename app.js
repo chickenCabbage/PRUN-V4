@@ -9,17 +9,20 @@ function wrnPrint(text) {
 	console.log(colors.yellow("WARNING: ") + text);
 }
 
+var fs = require("fs");
+var forbiddenFiles = ["./prefs.html", "./mysqlConfig.json"];
+var landingPage = "./index.html"; //the page you get when you request "/"
+
 var mysql = require('mysql');
-
+var mysqlConfig = JSON.parse(fs.readFileSync("./mysqlConfig.json"));
 var con = mysql.createConnection({
-	host: "localhost",
-	user: "root",
-	password: "please",
-	database: "prun"
+	host: mysqlConfig.host,
+	user: mysqlConfig.user,
+	password: mysqlConfig.password,
+	database: mysqlConfig.database
 });
-
 con.connect(function(err) {
-	if(err) {
+	if(err) { //if an error was thrown
 		errPrint("Could not connect to MySQL!");
 		throw err;
 	}
@@ -28,10 +31,6 @@ con.connect(function(err) {
 var http = require("http");
 var port = 80;
 
-var fs = require("fs");
-var forbiddenFiles = ["./prefs.html"];
-var landingPage = "./index.html"; //the page you get when you request "/"
-
 var crypto = require("crypto"); //password hashing
 
 http.createServer(function(request, response) { //on every request to the server:
@@ -39,10 +38,8 @@ http.createServer(function(request, response) { //on every request to the server
 	if(filePath == "./") filePath = landingPage; //there isn't actually a file as the directory.
 	//so we need to redirect the filepath to the actual landing page.
 	if(request.method == "GET") { //if the request has no hidden data
-		for (var i = forbiddenFiles.length - 1; i >= 0; i--) {
-			if(filePath.includes(forbiddenFiles[i])) {
-				serveError(403, "403, file forbidden.", request, response);
-			}
+		if(forbiddenFiles.join().includes(filePath)) {
+			serveError(403, "403, file forbidden.", request, response);
 		}
 
 		if(filePath.indexOf("?") != -1) { //if there's GET data
@@ -109,7 +106,7 @@ function extractPost(request, response) {
 	});
 	request.on("end", function() { //when it's done reading the request
 		if(response) { //if the called gave a response object for autoserving
-			authLogin(parsePost(data), response); //do so
+			authLogin(parsePost(data, response), response); //do so
 		}
 		else { //otherwise
 			return data; //return normally
@@ -124,14 +121,21 @@ function querySQL(cmd) {
 		});
 	});
 	return dataPromise;
-}
+} //end querySQL()
 
-function parsePost(data) {
+function parsePost(data, request) {
 	var json = {
 		email: data.split("=")[1].split("&")[0],
 		pw: hash(data.split("=")[2].split("&")[0])
 	}
-	return json;
+
+	if(new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(json.email.replace("%40", "@"))) {
+		return json;
+	}
+	else {
+		errPrint("Illegal email!");
+		return null;
+	}
 } //end parsePost()
 
 function parseCookies(cookies) {
@@ -181,11 +185,11 @@ function serveError(code, text, request, response) { //internal server error
 function authLogin(postJson, response) {
 	try {
 		var cmd = "SELECT pw, updates FROM users WHERE email = '" + postJson.email + "';";
-		querySQL(cmd).then(function(data) {
+		querySQL(cmd).then(function(data) { //wait for the promise
 			var pw = data[0].pw;
 			var ver = data[0].updates;
 			
-			if(ver == "v") {
+			if(ver == "v") { //if the user wasn't verified yet
 				response.writeHead(200, {"Content-Type": "text/plain"});
 				response.end("verify");
 				return;
@@ -197,10 +201,10 @@ function authLogin(postJson, response) {
 					response.writeHead(200, {
 						"Set-Cookie": [
 							"email=" + postJson.email + "; expires=2628000000;",
-							"pw=" + hash(postJson.pw) + "; expires=2628000000; HttpOnly;"
+							"pw=" + hash(postJson.pw) + "; expires=2628000000; HttpOnly;" //add cookies
 						],
 						"Content-Type": "text/plain"
-					}); //emd response.writeHead
+					}); //end response.writeHead
 					response.end(prefs);
 				}
 				else {
@@ -211,9 +215,9 @@ function authLogin(postJson, response) {
 				response.writeHead(200, {"Content-Type": "text/plain"});
 				response.end("password");
 			}
-		}).catch(function(fromReject) {
+		}).catch(function(fromReject) { //MySQL could not give an answer
 			response.writeHead(200, {"Content-Type": "text/plain"});
-			response.end("user");
+			response.end("user"); //there was an empty set for the query, probably
 		});
 	}
 	catch(err) {
