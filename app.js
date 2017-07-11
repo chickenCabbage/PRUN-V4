@@ -180,9 +180,17 @@ function serveError(code, text, request, response) { //internal server error
 
 function authLogin(postJson, response) {
 	try {
-		var cmd = "SELECT pw FROM users WHERE email = '" + postJson.email + "';";
-		querySQL(cmd).then(function(pw) {
-			pw = pw[0].pw;
+		var cmd = "SELECT pw, updates FROM users WHERE email = '" + postJson.email + "';";
+		querySQL(cmd).then(function(data) {
+			var pw = data[0].pw;
+			var ver = data[0].updates;
+			
+			if(ver == "v") {
+				response.writeHead(200, {"Content-Type": "text/plain"});
+				response.end("verify");
+				return;
+			}
+
 			if(pw == postJson.pw) { //success!
 				var prefs = fs.readFileSync("./prefs.html"); //serve the prefs page
 				if(response) {
@@ -204,7 +212,8 @@ function authLogin(postJson, response) {
 				response.end("password");
 			}
 		}).catch(function(fromReject) {
-			throw "Promise rejected: " + fromReject;
+			response.writeHead(200, {"Content-Type": "text/plain"});
+			response.end("user");
 		});
 	}
 	catch(err) {
