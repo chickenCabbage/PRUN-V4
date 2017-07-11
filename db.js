@@ -7,19 +7,18 @@ var con = mysql.createConnection({
 	database: "prun"
 });
 
+con.connect();
+
 function querySQL(cmd) {
-	con.connect(function(err) {
-		if (err){
-			throw err;
-		}
-		con.query(cmd, function (err, result, fields) {
-			if(err) {
-				throw err;
-			}
-			console.log(result[0]);
+	var dataPromise = new Promise(function(resolve, reject) {
+		con.query(cmd, function(err, result) {
+			resolve(result);
 			con.end();
 		});
 	});
+	return dataPromise;
 }
 
-querySQL("SELECT * FROM users where email='alon.shiboleth@gmail.com';");
+querySQL("select * from users").then(function(fromResolve) {
+	return fromResolve;
+});

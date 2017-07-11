@@ -9,6 +9,22 @@ function wrnPrint(text) {
 	console.log(colors.yellow("WARNING: ") + text);
 }
 
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+	host: "localhost",
+	user: "root",
+	password: "please",
+	database: "prun"
+});
+
+con.connect(function(err) {
+	if(err) {
+		errPrint("Could not connect to MySQL!");
+		throw err;
+	}
+});
+
 var http = require("http");
 var port = 80;
 
@@ -101,13 +117,22 @@ function extractPost(request, response) {
 	});
 } //end extractPost()
 
+function querySQL(cmd) {
+	var dataPromise = new Promise(function(resolve, reject) {
+		con.query(cmd, function(err, result) {
+			resolve(result);
+		});
+	});
+	return dataPromise;
+}
+
 function parsePost(data) {
 	var json = {
 		email: data.split("=")[1].split("&")[0],
-		pw: data.split("=")[2].split("&")[0]
+		pw: hash(data.split("=")[2].split("&")[0])
 	}
 	return json;
-} //end toJson()
+} //end parsePost()
 
 function parseCookies(cookies) {
 	cookies = {
@@ -155,27 +180,32 @@ function serveError(code, text, request, response) { //internal server error
 
 function authLogin(postJson, response) {
 	try {
-		var pw = "testPassword";
-		if(pw == postJson.pw) { //success!
-			var prefs = fs.readFileSync("./prefs.html"); //serve the prefs page
-			if(response) {
-				response.writeHead(200, {
-					"Set-Cookie": [
-						"email=" + postJson.email + "; expires=2628000000;",
-						"pw=" + hash(postJson.pw) + "; expires=2628000000; HttpOnly;"
-					],
-					"Content-Type": "text/plain"
-				}); //emd response.writeHead
-				response.end(prefs);
+		var cmd = "SELECT pw FROM users WHERE email = '" + postJson.email + "';";
+		querySQL(cmd).then(function(pw) {
+			pw = pw[0].pw;
+			if(pw == postJson.pw) { //success!
+				var prefs = fs.readFileSync("./prefs.html"); //serve the prefs page
+				if(response) {
+					response.writeHead(200, {
+						"Set-Cookie": [
+							"email=" + postJson.email + "; expires=2628000000;",
+							"pw=" + hash(postJson.pw) + "; expires=2628000000; HttpOnly;"
+						],
+						"Content-Type": "text/plain"
+					}); //emd response.writeHead
+					response.end(prefs);
+				}
+				else {
+					return prefs;
+				}
+			} //end if
+			else { //password was wrong
+				response.writeHead(200, {"Content-Type": "text/plain"});
+				response.end("password");
 			}
-			else {
-				return prefs;
-			}
-		} //end if
-		else { //password was wrong
-			response.writeHead(200, {"Content-Type": "text/plain"});
-			response.end("password");
-		}
+		}).catch(function(fromReject) {
+			throw "Promise rejected: " + fromReject;
+		});
 	}
 	catch(err) {
 		errPrint("in authLogin: " + err);
