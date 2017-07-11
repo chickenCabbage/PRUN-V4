@@ -26,14 +26,15 @@ function authLogin() {
 				break;
 
 				default:
-					document.open();
-					document.write(data);
-					document.close();
+					document.documentElement.innerHTML = data;
 				break;
 			}
 		},
-		error: function(data) {
-			alert("There was a problem in logging in. Here's what we know:\n" + data);
+		error: function(jqxhr, error, errorThrown) {
+			alert("There was a problem in logging in.\n" +
+				"Status of " + jqxhr.status + ", server response: " + jqxhr.responseText + 
+				"\nHere's what we gathered:\n" + error + "\n" + errorThrown +
+				"\nIf this error presists please file an issue at the GitHub repository.");
 		}
 	});
 }

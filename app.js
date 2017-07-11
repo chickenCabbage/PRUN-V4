@@ -93,7 +93,7 @@ function extractPost(request, response) {
 	});
 	request.on("end", function() { //when it's done reading the request
 		if(response) { //if the called gave a response object for autoserving
-			authLogin(parsePost(data), request, response); //do so
+			authLogin(parsePost(data), response); //do so
 		}
 		else { //otherwise
 			return data; //return normally
@@ -155,7 +155,7 @@ function serveError(code, text, request, response) { //internal server error
 
 function authLogin(postJson, response) {
 	try {
-		var pw = "";
+		var pw = "testPassword";
 		if(pw == postJson.pw) { //success!
 			var prefs = fs.readFileSync("./prefs.html"); //serve the prefs page
 			if(response) {
@@ -172,6 +172,10 @@ function authLogin(postJson, response) {
 				return prefs;
 			}
 		} //end if
+		else { //password was wrong
+			response.writeHead(200, {"Content-Type": "text/plain"});
+			response.end("password");
+		}
 	}
 	catch(err) {
 		errPrint("in authLogin: " + err);
