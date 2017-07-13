@@ -5,18 +5,21 @@ var client = new insp("http://praguerace.com/", {
 		"User-Agent": "prunScraper/update.js" //user agent
 	}
 }); //crawling config
-var exec = require("child_process").exec; //for mailing jars
-var colors = require("colors"); //for fancy console
-var fs = require("fs"); //for readng the files
+
 var intervalTime = 2 * 60 * 1000;
 
+/*var exec = require("child_process").exec; //for mailing jars*/
+
+var fs = require("fs"); //for readng the files
 var title = fs.readFileSync("./update.txt").toString().split("	")[1]; //stores the page's title
 
-function errPrint(text) { //in case of error
-	console.log("\n" + colors.red("ERROR: ") + text);
-	console.log("Error occured on " + now() + "\n");
+var colors = require("colors"); //for fancy console
+function errPrint(text) {
+	console.log("\n--------------------");
+	console.log(colors.red("ERROR: ") + text);
+	console.log("--------------------\n");
 }
-function wrnPrint(text) { //in case of something important
+function wrnPrint(text) {
 	console.log(colors.yellow("WARNING: ") + text);
 }
 

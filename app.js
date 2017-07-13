@@ -37,11 +37,12 @@ http.createServer(function(request, response) { //on every request to the server
 	var filePath = "." + request.url;
 	if(filePath == "./") filePath = landingPage; //there isn't actually a file as the directory.
 	//so we need to redirect the filepath to the actual landing page.
-	if(request.method == "GET") { //if the request has no hidden data
-		if(forbiddenFiles.join().includes(filePath)) {
-			serveError(403, "403, file forbidden.", request, response);
-		}
 
+	if(forbiddenFiles.join().includes(filePath)) {
+		serveError(403, "403, file forbidden.", request, response);
+	}
+
+	if(request.method == "GET") { //if the request has no hidden data
 		if(filePath.indexOf("?") != -1) { //if there's GET data
 			//do stuff here /////////////////////////////////////////////////////////////
 		}
