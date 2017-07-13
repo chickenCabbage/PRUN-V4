@@ -21,7 +21,7 @@ function errPrint(text) {
 }
 function wrnPrint(text) {
 	console.log(colors.yellow("WARNING: ") + text);
-}
+} 	
 
 function now() { //return the current time
 	var date = new Date();
