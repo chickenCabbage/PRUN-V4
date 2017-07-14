@@ -130,13 +130,8 @@ function parsePost(data, request) {
 		pw: hash(data.split("=")[2].split("&")[0])
 	}
 
-	if(new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(json.email.replace("%40", "@"))) {
-		return json;
-	}
-	else {
-		errPrint("Illegal email!");
-		return null;
-	}
+	if(testEmail(json.email) && testPassword(json.pw)) return json;
+	else return null;
 } //end parsePost()
 
 function parseCookies(cookies) {
@@ -156,6 +151,25 @@ function hash(text) { //encrypt text
 		return null;
 	}
 } //end hash()
+
+function testEmail(email) {
+	if(new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(json.email.replace("%40", "@"))) {
+		return true;
+	}
+	else {
+		errPrint("Illegal email!");
+		return false;
+	}
+} //end testEmail()
+
+function testPassword(pw) {
+	if(new RegExp(/(?=.*?[a-z])(?=.*?[0-9]).{8,20}/).test(pw)) {
+		return true;
+	}
+	else
+		errPrint("Invalid password!");
+		return false;
+} //end testPassword()
 
 function serveText(text, response) {
 	try {
@@ -191,8 +205,7 @@ function authLogin(postJson, response) {
 			var ver = data[0].updates;
 			
 			if(ver == "v") { //if the user wasn't verified yet
-				response.writeHead(200, {"Content-Type": "text/plain"});
-				response.end("verify");
+				serveText("verify", response);
 				return;
 			}
 
@@ -213,12 +226,10 @@ function authLogin(postJson, response) {
 				}
 			} //end if
 			else { //password was wrong
-				response.writeHead(200, {"Content-Type": "text/plain"});
-				response.end("password");
+				serveText("password", response);
 			}
 		}).catch(function(fromReject) { //MySQL could not give an answer
-			response.writeHead(200, {"Content-Type": "text/plain"});
-			response.end("user"); //there was an empty set for the query, probably
+			serveText("user", response);
 		});
 	}
 	catch(err) {
