@@ -51,6 +51,16 @@ input {
 	cursor: pointer;
 }
 
+#msg {
+	opacity: 0;
+	font-weight: bold;
+	font-size: 1.33em;
+	margin: 0% auto;
+	transition: 0.2s;
+	padding: 0.1%;
+	width: 50%;
+}
+
 #nav {
 	top: 95%;
 	width: 100%;
@@ -73,7 +83,7 @@ input {
 #topbar {
 	padding-top: 0.005%;
 	padding-bottom: 0.005%;
-margin-top: 0%;
+	margin-top: 0%;
 }
 
 #openNav, #closeNav {

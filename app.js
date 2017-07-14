@@ -107,7 +107,7 @@ function extractPost(request, response) {
 	});
 	request.on("end", function() { //when it's done reading the request
 		if(response) { //if the called gave a response object for autoserving
-			authLogin(parsePost(data, response), response); //do so
+			authLogin(parsePost(data, request, response), response); //do so
 		}
 		else { //otherwise
 			return data; //return normally
@@ -124,14 +124,23 @@ function querySQL(cmd) {
 	return dataPromise;
 } //end querySQL()
 
-function parsePost(data, request) {
+function parsePost(data, request, response) {
 	var json = {
 		email: data.split("=")[1].split("&")[0],
 		pw: hash(data.split("=")[2].split("&")[0])
 	}
 
-	if(testEmail(json.email) && testPassword(json.pw)) return json;
-	else return null;
+	if(testEmail(json.email)) {
+		if(testPassword(json.pw)) return json;
+		else {
+			serveText("illegal-password", response);
+			return;
+		}
+	}
+	else {
+		serveText("illegal-email", response);
+		return;
+	}
 } //end parsePost()
 
 function parseCookies(cookies) {
@@ -153,22 +162,17 @@ function hash(text) { //encrypt text
 } //end hash()
 
 function testEmail(email) {
-	if(new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(json.email.replace("%40", "@"))) {
+	if(new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(email.replace("%40", "@"))) {
 		return true;
 	}
-	else {
-		errPrint("Illegal email!");
-		return false;
-	}
+	else return false;
 } //end testEmail()
 
 function testPassword(pw) {
 	if(new RegExp(/(?=.*?[a-z])(?=.*?[0-9]).{8,20}/).test(pw)) {
 		return true;
 	}
-	else
-		errPrint("Invalid password!");
-		return false;
+	else return false;
 } //end testPassword()
 
 function serveText(text, response) {
