@@ -1,5 +1,3 @@
-var xh = new XMLHttpRequest();
-
 function authLogin() {
 	var email = document.getElementById("email").value;
 	var pw = document.getElementById("pw").value;
@@ -51,7 +49,7 @@ function authLogin() {
 				break;
 
 				default:
-					document.documentElement.innerHTML = data;
+					document.write(data);
 				break;
 			}
 		},

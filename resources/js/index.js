@@ -1,6 +1,10 @@
 var updateText;
 var lastCheckTime = 0;
 
+window.onLoad = function() {
+	document.getElementsByTagName("BODY")[0].style.opacity = "0";
+}
+
 window.onLoad = jQuery.get("/update.txt", function(data, status) { //init
 	updateText = data;
 	assignSplitted();
