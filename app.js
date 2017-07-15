@@ -131,16 +131,22 @@ function parsePost(data, request, response) {
 		pw: hash(data.split("=")[2].split("&")[0])
 	}
 
-	if(testEmail(json.email)) {
-		if(testPassword(json.pw)) return json;
+	if(testEmail(json.email) || !json.email) {
+		if(testPassword(json.pw) || !json.pw) return json;
 		else {
 			serveText("illegal-password", response);
-			return;
+			return {
+				email: "illegalPassword",
+				pw: "illegalPassword"
+			};
 		}
 	}
 	else {
 		serveText("illegal-email", response);
-		return;
+		return {
+			email: "illegalEmail",
+			pw: "illegaleEmail"
+		};
 	}
 } //end parsePost()
 
