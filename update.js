@@ -8,6 +8,8 @@ var client = new insp("http://praguerace.com/", {
 
 var intervalTime = 2 * 60 * 1000;
 
+var configPath = "./resources/config/";
+
 /*var exec = require("child_process").exec; //for mailing jars*/
 
 var fs = require("fs"); //for readng the files
@@ -29,7 +31,7 @@ function now() { //return the current time
 }
 
 var mysql = require('mysql');
-var mysqlConfig = JSON.parse(fs.readFileSync("./mysqlConfig.json"));
+var mysqlConfig = JSON.parse(fs.readFileSync(configPath + "mysqlConfig.json"));
 var con = mysql.createConnection({
 	host: mysqlConfig.host,
 	user: mysqlConfig.user,
@@ -51,6 +53,27 @@ function querySQL(cmd) {
 	});
 	return dataPromise;
 } //end querySQL()
+
+var nodemailer = require("nodemailer");
+var mailConfig = JSON.parse(fs.readFileSync(configPath + "mailConfig.json"));
+var transporter = nodemailer.createTransport({
+	service: mailConfig.service,
+	auth: mailConfig.auth
+});
+
+function sendMail(recip) {
+	var mailOptions = {
+		from: mailConfig.auth.user,
+		to: recip,
+		subject: "Prague Race just updated!",
+		html: fs.readFileSync("./resources/email.html")
+	};
+
+	transporter.sendMail(mailOptions, function(error, info){
+		if(error) errPrint("in mailing!\n" + error);
+		else wrnPrint("Email sent.");
+	});
+}//end sendMail()
 
 function testEmail(email) {
 	if(new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(email.replace("%40", "@"))) {
@@ -78,11 +101,11 @@ client.on("fetch", function(){ //when client.fetch() is called
 
 			var cmd = "SELECT email FROM users WHERE updates = 'y';";
 			querySQL(cmd).then(function(data) { //wait for the promise
-				var allEmails = "";
+				var allEmails = [];
 				for(i = 0; i < data.length; i ++) {
-					if(!testEmail) allEmails = allEmails + data[i].email.replace("%40", "@") + " ";
+					if(testEmail) allEmails[i] = data[i].email.replace("%40", "@");
 				}
-				wrnPrint(allEmails);
+				sendMail(allEmails.toString());
 			}).catch(function(fromReject) { //MySQL could not give an answer
 				errPrint("SQL promise rejected! " + fromReject);
 			});

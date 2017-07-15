@@ -10,11 +10,12 @@ function wrnPrint(text) {
 }
 
 var fs = require("fs");
-var forbiddenFiles = ["./prefs.html", "./mysqlConfig.json"];
+var configPath = "./resources/config/";
+var forbiddenFiles = ["./prefs.html", configPath + "mysqlConfig.json", configPath + "mailConfig.json"];
 var landingPage = "./index.html"; //the page you get when you request "/"
 
 var mysql = require('mysql');
-var mysqlConfig = JSON.parse(fs.readFileSync("./mysqlConfig.json"));
+var mysqlConfig = JSON.parse(fs.readFileSync(configPath + "mysqlConfig.json"));
 var con = mysql.createConnection({
 	host: mysqlConfig.host,
 	user: mysqlConfig.user,
@@ -157,7 +158,7 @@ function hash(text) { //encrypt text
 	}
 	catch(err) {
 		errPrint("in hashing: " + err);
-		return null;
+		return false;
 	}
 } //end hash()
 

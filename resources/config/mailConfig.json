@@ -1,0 +1,7 @@
+{
+	"service": "gmail",
+	"auth": {
+		"user": "mailer.prun@gmail.com",
+		"pass": "node.js fucking sucks"
+	}
+}
