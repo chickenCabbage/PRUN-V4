@@ -99,7 +99,7 @@ client.on("fetch", function(){ //when client.fetch() is called
 			wrnPrint("UPDATED! on " + time + ": " + client.title); //woo
 			console.log("Recoginzed on " + now() + "\n");
 
-			var cmd = "SELECT email FROM users WHERE updates = 'y';";
+			var cmd = "SELECT email FROM v4 WHERE updates = 'y';";
 			querySQL(cmd).then(function(data) { //wait for the promise
 				var allEmails = [];
 				for(i = 0; i < data.length; i ++) {

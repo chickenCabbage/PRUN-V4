@@ -210,7 +210,7 @@ function serveError(code, text, request, response) { //internal server error
 
 function authLogin(postJson, response) {
 	try {
-		var cmd = "SELECT pw, updates FROM users WHERE email = '" + postJson.email + "';";
+		var cmd = "SELECT pw, updates FROM v4 WHERE email = '" + postJson.email + "';";
 		querySQL(cmd).then(function(data) { //wait for the promise
 			var pw = data[0].pw;
 			var ver = data[0].updates;
